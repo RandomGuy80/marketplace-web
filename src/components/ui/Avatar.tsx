@@ -1,0 +1,42 @@
+import Image from 'next/image'
+import { cn } from '@/lib/utils'
+
+interface AvatarProps {
+  src?: string | null
+  name: string
+  size?: number
+  className?: string
+}
+
+export function Avatar({ src, name, size = 40, className }: AvatarProps) {
+  const initials = name
+    .split(' ')
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+
+  if (src) {
+    const fullSrc = src.startsWith('http') ? src : `http://localhost:8080${src}`
+    return (
+      <div
+        className={cn('relative rounded-full overflow-hidden flex-shrink-0', className)}
+        style={{ width: size, height: size }}
+      >
+        <Image src={fullSrc} alt={name} fill className="object-cover" sizes={`${size}px`} />
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className={cn(
+        'rounded-full bg-indigo-100 text-indigo-700 font-semibold flex items-center justify-center flex-shrink-0',
+        className
+      )}
+      style={{ width: size, height: size, fontSize: size * 0.38 }}
+    >
+      {initials}
+    </div>
+  )
+}
