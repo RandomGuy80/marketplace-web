@@ -10,6 +10,7 @@ import { ListingCardSkeleton } from '@/components/ui/Skeleton'
 import { Button } from '@/components/ui/Button'
 import type { Listing, ListingsFilter } from '@/types'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { DEMO_LISTINGS } from '@/lib/demo'
 
 function ListingsContent() {
   const searchParams = useSearchParams()
@@ -87,7 +88,9 @@ function ListingsContent() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {isLoading && !allItems.length
           ? Array.from({ length: 8 }).map((_, i) => <ListingCardSkeleton key={i} />)
-          : allItems.map((l, i) => <ListingCard key={l.id} listing={l} index={i} />)}
+          : (allItems.length > 0 ? allItems : (!filter.q && !filter.category_id ? DEMO_LISTINGS : [])).map((l, i) => (
+              <ListingCard key={l.id} listing={l} index={i} />
+            ))}
       </div>
 
       {data?.next_cursor && (
@@ -98,7 +101,7 @@ function ListingsContent() {
         </div>
       )}
 
-      {!isLoading && allItems.length === 0 && (
+      {!isLoading && allItems.length === 0 && (filter.q || filter.category_id) && (
         <div className="text-center py-24 text-zinc-600">
           <p className="text-5xl mb-4 opacity-30">🔍</p>
           <p className="text-base font-medium text-zinc-500">No listings found</p>

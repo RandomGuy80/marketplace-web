@@ -6,46 +6,71 @@ import { motion, useMotionValue, useSpring } from 'framer-motion'
 export function Cursor() {
   const [visible, setVisible] = useState(false)
   const [clicking, setClicking] = useState(false)
-  const cursorX = useMotionValue(-100)
-  const cursorY = useMotionValue(-100)
+  const [hovering, setHovering] = useState(false)
 
-  const springX = useSpring(cursorX, { stiffness: 500, damping: 40 })
-  const springY = useSpring(cursorY, { stiffness: 500, damping: 40 })
+  const mouseX = useMotionValue(-100)
+  const mouseY = useMotionValue(-100)
+
+  // Dot follows instantly
+  const dotX = useSpring(mouseX, { stiffness: 1000, damping: 60 })
+  const dotY = useSpring(mouseY, { stiffness: 1000, damping: 60 })
+
+  // Ring follows with satisfying lag
+  const ringX = useSpring(mouseX, { stiffness: 160, damping: 22 })
+  const ringY = useSpring(mouseY, { stiffness: 160, damping: 22 })
 
   useEffect(() => {
-    // Only show on non-touch devices
-    if ('ontouchstart' in window) return
+    if (typeof window === 'undefined') return
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return
 
-    const move = (e: MouseEvent) => {
-      cursorX.set(e.clientX)
-      cursorY.set(e.clientY)
-      setVisible(true)
+    const onMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX)
+      mouseY.set(e.clientY)
+      if (!visible) setVisible(true)
+
+      const target = e.target as HTMLElement
+      setHovering(
+        !!target.closest('a, button, [role="button"], input, select, textarea, label')
+      )
     }
-    const down = () => setClicking(true)
-    const up = () => setClicking(false)
+    const onDown = () => setClicking(true)
+    const onUp = () => setClicking(false)
 
-    window.addEventListener('mousemove', move)
-    window.addEventListener('mousedown', down)
-    window.addEventListener('mouseup', up)
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mousedown', onDown)
+    window.addEventListener('mouseup', onUp)
     return () => {
-      window.removeEventListener('mousemove', move)
-      window.removeEventListener('mousedown', down)
-      window.removeEventListener('mouseup', up)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mousedown', onDown)
+      window.removeEventListener('mouseup', onUp)
     }
-  }, [cursorX, cursorY])
+  }, [mouseX, mouseY, visible])
 
   if (!visible) return null
 
   return (
     <>
-      {/* Dot */}
+      {/* Outer ring — lags behind */}
+      <motion.div
+        className="fixed top-0 left-0 pointer-events-none z-[9998] mix-blend-difference"
+        style={{ x: ringX, y: ringY, translateX: '-50%', translateY: '-50%' }}
+        animate={{
+          scale: clicking ? 0.65 : hovering ? 1.7 : 1,
+          opacity: clicking ? 0.5 : 1,
+        }}
+        transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+      >
+        <div className="w-9 h-9 rounded-full border border-white" />
+      </motion.div>
+
+      {/* Inner dot — instant */}
       <motion.div
         className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
-        style={{ x: springX, y: springY, translateX: '-50%', translateY: '-50%' }}
-        animate={{ scale: clicking ? 0.6 : 1 }}
-        transition={{ duration: 0.1 }}
+        style={{ x: dotX, y: dotY, translateX: '-50%', translateY: '-50%' }}
+        animate={{ scale: clicking ? 0.6 : hovering ? 0 : 1 }}
+        transition={{ type: 'spring', stiffness: 600, damping: 35 }}
       >
-        <div className="w-4 h-4 bg-white rounded-full" />
+        <div className="w-[5px] h-[5px] rounded-full bg-white" />
       </motion.div>
     </>
   )
