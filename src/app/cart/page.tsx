@@ -47,7 +47,7 @@ export default function CartPage() {
   const handleCheckoutAll = async () => {
     if (!user) { router.push('/login'); return }
     if (realItems.length === 0) {
-      toast('No real items to check out', 'info')
+      toast('Cart only has demo items — create a real listing to test checkout', 'info')
       return
     }
     setCheckingOut(true)
@@ -186,27 +186,22 @@ export default function CartPage() {
           </div>
         </div>
 
-        {/* Pay all button */}
-        {realItems.length > 0 ? (
-          <Button
-            size="lg"
-            className="w-full"
-            loading={checkingOut}
-            onClick={handleCheckoutAll}
-          >
-            <CreditCard size={17} />
-            {checkingOut ? 'Creating orders…' : `Pay All — ${formatPrice(realTotal)}`}
-          </Button>
-        ) : (
-          <div className="text-center py-2">
-            <p className="text-sm text-zinc-600">Only demo items in cart — no real checkout available</p>
-            <Link href="/listings" className="text-xs text-zinc-500 hover:text-zinc-300 mt-1 inline-block transition-colors">
-              Browse real listings →
-            </Link>
-          </div>
-        )}
+        {/* Pay all button — always visible */}
+        <Button
+          size="lg"
+          className="w-full"
+          loading={checkingOut}
+          onClick={handleCheckoutAll}
+        >
+          <CreditCard size={17} />
+          {checkingOut
+            ? 'Creating orders…'
+            : realItems.length > 0
+              ? `Pay All — ${formatPrice(realTotal)}`
+              : 'Pay All'}
+        </Button>
 
-        {realItems.length > 0 && realItems.length > 1 && (
+        {realItems.length > 1 && (
           <p className="text-xs text-zinc-700 text-center">
             Each item is a separate Stripe session — you&apos;ll pay the first item now, remaining orders stay pending in{' '}
             <Link href="/orders" className="text-zinc-500 hover:text-zinc-300 transition-colors">Orders</Link>.
