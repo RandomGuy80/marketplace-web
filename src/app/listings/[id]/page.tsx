@@ -21,6 +21,7 @@ import { formatPrice, formatDate, getImageUrl } from '@/lib/utils'
 import { useState } from 'react'
 import { isAxiosError } from 'axios'
 import { DEMO_LISTINGS } from '@/lib/demo'
+import { useCartStore } from '@/lib/store/cart'
 
 export default function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -29,6 +30,7 @@ export default function ListingDetailPage({ params }: { params: Promise<{ id: st
   const router = useRouter()
   const [buying, setBuying] = useState(false)
   const [imgIdx, setImgIdx] = useState(0)
+  const { addItem, hasItem } = useCartStore()
 
   const isDemo = id.startsWith('demo-')
   const demoListing = isDemo ? DEMO_LISTINGS.find((l) => l.id === id) ?? null : null
@@ -228,31 +230,31 @@ export default function ListingDetailPage({ params }: { params: Promise<{ id: st
 
           {/* ── Actions ── */}
           <div className="flex gap-2 mt-auto pt-1">
-            {/* Real listing — logged in buyer */}
-            {canBuy && (
-              <Button size="lg" className="flex-1" onClick={handleBuy} loading={buying}>
-                <ShoppingCart size={17} /> Buy Now
-              </Button>
-            )}
-
-            {/* Demo listing — not logged in */}
-            {isDemo && !user && listing.status === 'active' && (
-              <Link href="/login" className="flex-1">
-                <Button size="lg" className="w-full">
-                  <ShoppingCart size={17} /> Sign in to Buy
+            {listing.status === 'active' && !isOwner && (
+              <>
+                {/* Add to Cart — works for everyone */}
+                <Button
+                  size="lg"
+                  variant={hasItem(listing.id) ? 'secondary' : 'primary'}
+                  className="flex-1"
+                  onClick={() => {
+                    if (!user) { router.push('/login'); return }
+                    const added = addItem(listing)
+                    if (added) toast('Added to cart', 'success')
+                    else toast('Already in cart', 'info')
+                  }}
+                >
+                  <ShoppingCart size={17} />
+                  {hasItem(listing.id) ? 'In Cart' : 'Add to Cart'}
                 </Button>
-              </Link>
-            )}
 
-            {/* Demo listing — logged in */}
-            {isDemo && user && listing.status === 'active' && (
-              <Button
-                size="lg"
-                className="flex-1"
-                onClick={() => toast('This is a demo listing — no real inventory yet.', 'info')}
-              >
-                <ShoppingCart size={17} /> Add to Cart
-              </Button>
+                {/* Buy Now — real listings only */}
+                {canBuy && (
+                  <Button size="lg" variant="secondary" onClick={handleBuy} loading={buying}>
+                    Buy Now
+                  </Button>
+                )}
+              </>
             )}
 
             {/* Owner actions */}
@@ -267,13 +269,6 @@ export default function ListingDetailPage({ params }: { params: Promise<{ id: st
               <Button variant="danger" size="lg" onClick={handleDelete}>
                 <Trash2 size={15} />
               </Button>
-            )}
-
-            {/* Not logged in, real listing */}
-            {!user && !isDemo && listing.status === 'active' && (
-              <Link href="/login" className="flex-1">
-                <Button size="lg" className="w-full">Sign in to Buy</Button>
-              </Link>
             )}
           </div>
         </div>
