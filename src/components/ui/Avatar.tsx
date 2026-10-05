@@ -17,13 +17,15 @@ export function Avatar({ src, name, size = 40, className }: AvatarProps) {
     .toUpperCase()
 
   if (src) {
-    const fullSrc = src.startsWith('http') ? src : `http://localhost:8080${src}`
+    const isExternal = src.startsWith('http')
+    const fullSrc = isExternal ? src : `http://localhost:8080${src}`
     return (
       <div
         className={cn('relative rounded-full overflow-hidden flex-shrink-0', className)}
         style={{ width: size, height: size }}
       >
-        <Image src={fullSrc} alt={name} fill className="object-cover" sizes={`${size}px`} />
+        {/* unoptimized for backend images — bypasses Next.js image CDN cache */}
+        <Image src={fullSrc} alt={name} fill className="object-cover" sizes={`${size}px`} unoptimized={!isExternal} />
       </div>
     )
   }

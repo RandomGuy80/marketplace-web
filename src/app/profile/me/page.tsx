@@ -52,6 +52,11 @@ export default function MyProfilePage() {
     try {
       await usersApi.uploadAvatar(file)
       const updated = await usersApi.getMe()
+      // append timestamp to bust browser HTTP cache when same filename is reused
+      if (updated.avatar) {
+        const base = updated.avatar.split('?')[0]
+        updated.avatar = `${base}?t=${Date.now()}`
+      }
       updateUser(updated)
       qc.invalidateQueries({ queryKey: ['me'] })
       toast('Avatar updated', 'success')
