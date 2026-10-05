@@ -85,29 +85,41 @@ function ListingsContent() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {isLoading && !allItems.length
-          ? Array.from({ length: 8 }).map((_, i) => <ListingCardSkeleton key={i} />)
-          : (allItems.length > 0 ? allItems : (!filter.q && !filter.category_id ? DEMO_LISTINGS : [])).map((l, i) => (
-              <ListingCard key={l.id} listing={l} index={i} />
-            ))}
-      </div>
+      {(() => {
+        const filteredDemo = DEMO_LISTINGS.filter((l) => {
+          const matchCat = !filter.category_id || l.category_id === filter.category_id
+          const q = filter.q?.toLowerCase() ?? ''
+          const matchQ = !q || l.title.toLowerCase().includes(q) || l.description.toLowerCase().includes(q)
+          return matchCat && matchQ
+        })
+        const items = allItems.length > 0 ? allItems : filteredDemo
 
-      {data?.next_cursor && (
-        <div className="mt-10 text-center">
-          <Button variant="outline" onClick={() => setCursor(data.next_cursor)}>
-            Load more
-          </Button>
-        </div>
-      )}
+        return (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {isLoading && !allItems.length
+                ? Array.from({ length: 8 }).map((_, i) => <ListingCardSkeleton key={i} />)
+                : items.map((l, i) => <ListingCard key={l.id} listing={l} index={i} />)}
+            </div>
 
-      {!isLoading && allItems.length === 0 && (filter.q || filter.category_id) && (
-        <div className="text-center py-24 text-zinc-600">
-          <p className="text-5xl mb-4 opacity-30">🔍</p>
-          <p className="text-base font-medium text-zinc-500">No listings found</p>
-          <p className="text-sm text-zinc-700 mt-1">Try a different search or category</p>
-        </div>
-      )}
+            {data?.next_cursor && (
+              <div className="mt-10 text-center">
+                <Button variant="outline" onClick={() => setCursor(data.next_cursor)}>
+                  Load more
+                </Button>
+              </div>
+            )}
+
+            {!isLoading && items.length === 0 && (
+              <div className="text-center py-24 text-zinc-600">
+                <p className="text-5xl mb-4 opacity-30">🔍</p>
+                <p className="text-base font-medium text-zinc-500">No listings found</p>
+                <p className="text-sm text-zinc-700 mt-1">Try a different search or category</p>
+              </div>
+            )}
+          </>
+        )
+      })()}
     </div>
   )
 }
