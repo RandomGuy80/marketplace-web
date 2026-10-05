@@ -235,12 +235,21 @@ export default function ListingDetailPage({ params }: { params: Promise<{ id: st
               </Button>
             )}
 
-            {/* Demo listing */}
-            {isDemo && listing.status === 'active' && (
+            {/* Demo listing — not logged in */}
+            {isDemo && !user && listing.status === 'active' && (
+              <Link href="/login" className="flex-1">
+                <Button size="lg" className="w-full">
+                  <ShoppingCart size={17} /> Sign in to Buy
+                </Button>
+              </Link>
+            )}
+
+            {/* Demo listing — logged in */}
+            {isDemo && user && listing.status === 'active' && (
               <Button
                 size="lg"
                 className="flex-1"
-                onClick={() => toast('This is a demo listing. Create a seller account to publish and buy real items!', 'info')}
+                onClick={() => toast('This is a demo listing — no real inventory yet.', 'info')}
               >
                 <ShoppingCart size={17} /> Add to Cart
               </Button>
