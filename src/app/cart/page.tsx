@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Trash2, ArrowRight, PackageOpen } from 'lucide-react'
+import { Trash2, ArrowRight, PackageOpen, CreditCard, Lock } from 'lucide-react'
 import { useCartStore } from '@/lib/store/cart'
 import { useAuthStore } from '@/lib/store/auth'
 import { ordersApi } from '@/lib/api/orders'
@@ -15,18 +15,22 @@ import { isAxiosError } from 'axios'
 import { useRouter } from 'next/navigation'
 
 export default function CartPage() {
-  const { items, removeItem } = useCartStore()
+  const { items, removeItem, clearCart } = useCartStore()
   const { user } = useAuthStore()
   const { toast } = useToast()
   const router = useRouter()
-  const [buying, setBuying] = useState<string | null>(null)
+  const [checkingOut, setCheckingOut] = useState(false)
+  const [buyingOne, setBuyingOne] = useState<string | null>(null)
 
-  const total = items.reduce((sum, { listing }) => sum + listing.price, 0)
   const isDemo = (id: string) => id.startsWith('demo-')
+  const realItems = items.filter(({ listing }) => !isDemo(listing.id))
+  const demoItems = items.filter(({ listing }) => isDemo(listing.id))
+  const total = items.reduce((sum, { listing }) => sum + listing.price, 0)
+  const realTotal = realItems.reduce((sum, { listing }) => sum + listing.price, 0)
 
-  const handleCheckout = async (listingId: string) => {
+  const handleCheckoutOne = async (listingId: string) => {
     if (!user) { router.push('/login'); return }
-    setBuying(listingId)
+    setBuyingOne(listingId)
     try {
       const order = await ordersApi.create(listingId)
       const { checkout_url } = await ordersApi.checkout(order.id)
@@ -34,7 +38,34 @@ export default function CartPage() {
     } catch (err) {
       const msg = isAxiosError(err) ? err.response?.data?.error ?? 'Checkout failed' : 'Checkout failed'
       toast(msg, 'error')
-      setBuying(null)
+      setBuyingOne(null)
+    }
+  }
+
+  // Creates orders for all real items, redirects to Stripe for the first one.
+  // Remaining orders stay as 'pending' in /orders.
+  const handleCheckoutAll = async () => {
+    if (!user) { router.push('/login'); return }
+    if (realItems.length === 0) {
+      toast('No real items to check out', 'info')
+      return
+    }
+    setCheckingOut(true)
+    try {
+      const checkoutUrls: string[] = []
+      for (const { listing } of realItems) {
+        const order = await ordersApi.create(listing.id)
+        const { checkout_url } = await ordersApi.checkout(order.id)
+        checkoutUrls.push(checkout_url)
+      }
+      // clear real items from cart; demo items stay
+      realItems.forEach(({ listing }) => removeItem(listing.id))
+      // go to Stripe for first item; the rest will be pending in /orders
+      window.location.href = checkoutUrls[0]
+    } catch (err) {
+      const msg = isAxiosError(err) ? err.response?.data?.error ?? 'Checkout failed' : 'Checkout failed'
+      toast(msg, 'error')
+      setCheckingOut(false)
     }
   }
 
@@ -65,65 +96,59 @@ export default function CartPage() {
         </Link>
       </div>
 
-      <div className="space-y-3">
+      {/* Items */}
+      <div className="space-y-2">
         <AnimatePresence initial={false}>
           {items.map(({ listing }) => (
             <motion.div
               key={listing.id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, x: -20, height: 0, marginBottom: 0 }}
+              exit={{ opacity: 0, x: -24, height: 0, padding: 0, margin: 0, border: 0 }}
               transition={{ duration: 0.2 }}
               className="flex items-center gap-4 bg-[#111] border border-[#222] rounded-2xl p-4"
             >
               {/* Thumbnail */}
-              <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0 border border-[#222]">
+              <Link href={`/listings/${listing.id}`} className="relative w-16 h-16 rounded-xl overflow-hidden bg-zinc-900 flex-shrink-0 border border-[#222]">
                 {listing.images?.[0] ? (
                   <Image
                     src={getImageUrl(listing.images[0])}
                     alt={listing.title}
                     fill
-                    className="object-cover"
+                    className="object-cover hover:scale-105 transition-transform duration-300"
                     sizes="64px"
                     unoptimized={!listing.images[0].startsWith('http')}
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-zinc-700 text-xl">🖼</div>
                 )}
-              </div>
+              </Link>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <Link href={`/listings/${listing.id}`} className="text-sm font-medium text-white hover:text-zinc-300 transition-colors line-clamp-1">
                   {listing.title}
                 </Link>
-                {listing.location && (
-                  <p className="text-xs text-zinc-600 mt-0.5">{listing.location}</p>
-                )}
-                {isDemo(listing.id) && (
-                  <span className="text-[10px] text-zinc-700 uppercase tracking-wider">demo item</span>
-                )}
+                <p className="text-xs text-zinc-600 mt-0.5">
+                  {listing.location && `${listing.location} · `}
+                  {isDemo(listing.id) ? <span className="text-zinc-700">demo</span> : 'Real listing'}
+                </p>
               </div>
 
               {/* Price + actions */}
               <div className="flex items-center gap-3 flex-shrink-0">
-                <span className="font-bold text-white text-sm">{formatPrice(listing.price, listing.currency)}</span>
+                <span className="font-bold text-white text-sm whitespace-nowrap">
+                  {formatPrice(listing.price, listing.currency)}
+                </span>
 
-                {!isDemo(listing.id) ? (
-                  <Button
-                    size="sm"
-                    onClick={() => handleCheckout(listing.id)}
-                    loading={buying === listing.id}
-                  >
-                    Buy
-                  </Button>
-                ) : (
+                {!isDemo(listing.id) && (
                   <Button
                     size="sm"
                     variant="secondary"
-                    onClick={() => toast('Demo item — connect the backend to purchase real listings', 'info')}
+                    onClick={() => handleCheckoutOne(listing.id)}
+                    loading={buyingOne === listing.id}
                   >
-                    Buy
+                    Pay
                   </Button>
                 )}
 
@@ -139,13 +164,59 @@ export default function CartPage() {
         </AnimatePresence>
       </div>
 
-      {/* Summary */}
-      <div className="mt-6 bg-[#111] border border-[#222] rounded-2xl p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <span className="text-zinc-400 text-sm">Subtotal</span>
-          <span className="font-bold text-white text-lg">{formatPrice(total)}</span>
+      {/* Summary + checkout */}
+      <div className="mt-5 bg-[#111] border border-[#222] rounded-2xl p-5 space-y-4">
+        {/* Totals */}
+        <div className="space-y-2">
+          {demoItems.length > 0 && realItems.length > 0 && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-zinc-600">Real items ({realItems.length})</span>
+              <span className="text-zinc-400">{formatPrice(realTotal)}</span>
+            </div>
+          )}
+          {demoItems.length > 0 && (
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-zinc-700">Demo items ({demoItems.length})</span>
+              <span className="text-zinc-700 line-through">{formatPrice(demoItems.reduce((s, { listing }) => s + listing.price, 0))}</span>
+            </div>
+          )}
+          <div className="flex items-center justify-between pt-2 border-t border-[#222]">
+            <span className="text-zinc-300 font-medium">Total</span>
+            <span className="font-bold text-white text-xl">{formatPrice(realTotal || total)}</span>
+          </div>
         </div>
-        <p className="text-xs text-zinc-600">Each item is checked out separately. Click Buy next to the item to proceed.</p>
+
+        {/* Pay all button */}
+        {realItems.length > 0 ? (
+          <Button
+            size="lg"
+            className="w-full"
+            loading={checkingOut}
+            onClick={handleCheckoutAll}
+          >
+            <CreditCard size={17} />
+            {checkingOut ? 'Creating orders…' : `Pay All — ${formatPrice(realTotal)}`}
+          </Button>
+        ) : (
+          <div className="text-center py-2">
+            <p className="text-sm text-zinc-600">Only demo items in cart — no real checkout available</p>
+            <Link href="/listings" className="text-xs text-zinc-500 hover:text-zinc-300 mt-1 inline-block transition-colors">
+              Browse real listings →
+            </Link>
+          </div>
+        )}
+
+        {realItems.length > 0 && realItems.length > 1 && (
+          <p className="text-xs text-zinc-700 text-center">
+            Each item is a separate Stripe session — you&apos;ll pay the first item now, remaining orders stay pending in{' '}
+            <Link href="/orders" className="text-zinc-500 hover:text-zinc-300 transition-colors">Orders</Link>.
+          </p>
+        )}
+
+        <div className="flex items-center justify-center gap-1.5 text-xs text-zinc-700">
+          <Lock size={11} />
+          Secured by Stripe
+        </div>
       </div>
     </div>
   )
