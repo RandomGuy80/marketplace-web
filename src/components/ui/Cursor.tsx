@@ -55,7 +55,7 @@ export function Cursor() {
         className="fixed top-0 left-0 pointer-events-none z-[9998] mix-blend-difference"
         style={{ x: ringX, y: ringY, translateX: '-50%', translateY: '-50%' }}
         animate={{
-          scale: clicking ? 0.65 : hovering ? 1.7 : 1,
+          scale: clicking ? 0.65 : hovering ? 1.3 : 1,
           opacity: clicking ? 0.5 : 1,
         }}
         transition={{ type: 'spring', stiffness: 400, damping: 28 }}

@@ -18,11 +18,22 @@ function ListingsContent() {
 
   const [filter, setFilter] = useState<ListingsFilter>({
     q: searchParams.get('q') ?? '',
+    category_id: searchParams.get('category_id') ? Number(searchParams.get('category_id')) : undefined,
     limit: 20,
   })
   const [input, setInput] = useState(filter.q ?? '')
   const [cursor, setCursor] = useState<string | undefined>()
   const [allItems, setAllItems] = useState<Listing[]>([])
+
+  // sync filter when URL changes (e.g. navigating from home page categories)
+  useEffect(() => {
+    const q = searchParams.get('q') ?? ''
+    const catId = searchParams.get('category_id') ? Number(searchParams.get('category_id')) : undefined
+    setInput(q)
+    setCursor(undefined)
+    setAllItems([])
+    setFilter({ q, category_id: catId, limit: 20 })
+  }, [searchParams])
 
   const { data, isLoading } = useQuery({
     queryKey: ['listings', filter, cursor],
