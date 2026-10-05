@@ -102,7 +102,7 @@ export default function HomePage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {isLoading
             ? Array.from({ length: 8 }).map((_, i) => <ListingCardSkeleton key={i} />)
-            : featured?.items.map((l, i) => <ListingCard key={l.id} listing={l} index={i} />)}
+            : (featured?.items ?? []).map((l, i) => <ListingCard key={l.id} listing={l} index={i} />)}
         </div>
       </section>
 

@@ -35,8 +35,9 @@ function ListingsContent() {
 
   useEffect(() => {
     if (data) {
-      if (!cursor) setAllItems(data.items ?? [])
-      else setAllItems((prev) => [...prev, ...(data.items ?? [])])
+      const items = data.items ?? []
+      if (!cursor) setAllItems(items)
+      else setAllItems((prev) => [...prev, ...items])
     }
   }, [data, cursor])
 
