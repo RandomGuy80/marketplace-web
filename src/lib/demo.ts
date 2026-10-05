@@ -268,7 +268,7 @@ export const DEMO_LISTINGS: Listing[] = [
     price: 185,
     currency: 'USD',
     status: 'active',
-    images: ['https://images.unsplash.com/photo-1549488344-cbb6c34484ac?w=600&q=85&auto=format&fit=crop'],
+    images: ['https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&q=85&auto=format&fit=crop'],
     tags: ['art', 'print', 'limited'],
     location: 'Remote',
     views: 521,
