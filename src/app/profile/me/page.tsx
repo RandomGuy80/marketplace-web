@@ -1,6 +1,6 @@
 'use client'
 
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
@@ -53,6 +53,7 @@ export default function MyProfilePage() {
       await usersApi.uploadAvatar(file)
       const updated = await usersApi.getMe()
       updateUser(updated)
+      qc.invalidateQueries({ queryKey: ['me'] })
       toast('Avatar updated', 'success')
     } catch {
       toast('Failed to upload avatar', 'error')
@@ -61,45 +62,47 @@ export default function MyProfilePage() {
     }
   }
 
-  if (!user) return <div className="max-w-2xl mx-auto px-4 py-8 space-y-4"><Skeleton className="h-32" /><Skeleton className="h-48" /></div>
+  if (!user) return (
+    <div className="max-w-2xl mx-auto px-4 py-10 space-y-4">
+      <Skeleton className="h-32" /><Skeleton className="h-48" />
+    </div>
+  )
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900">My Profile</h1>
+    <div className="max-w-2xl mx-auto px-4 py-10 space-y-4">
+      <h1 className="text-xl font-bold text-white tracking-tight">My Profile</h1>
 
-      {/* Avatar + stats */}
-      <div className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm flex items-center gap-6">
+      <div className="bg-[#111] rounded-2xl border border-[#222] p-6 flex items-center gap-6">
         <div className="relative">
           <Avatar src={user.avatar} name={user.name} size={80} />
           <button
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="absolute -bottom-1 -right-1 w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            className="absolute -bottom-1 -right-1 w-7 h-7 bg-white text-black rounded-full flex items-center justify-center hover:bg-zinc-200 transition-colors disabled:opacity-50 cursor-none"
           >
             <Camera size={13} />
           </button>
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
         </div>
         <div className="flex-1">
-          <p className="font-bold text-xl text-slate-900">{user.name}</p>
-          <p className="text-slate-500 text-sm">{user.email}</p>
+          <p className="font-bold text-xl text-white">{user.name}</p>
+          <p className="text-zinc-500 text-sm">{user.email}</p>
           <div className="flex items-center gap-3 mt-2">
             <Badge variant={user.role === 'seller' ? 'purple' : user.role === 'admin' ? 'danger' : 'info'}>
               {user.role}
             </Badge>
             {user.role === 'seller' && (
               <div className="flex items-center gap-1.5">
-                <Stars rating={user.rating} size={13} />
-                <span className="text-xs text-slate-500">{user.review_count} reviews</span>
+                <Stars rating={user.rating} size={12} />
+                <span className="text-xs text-zinc-600">{user.review_count} reviews</span>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Edit form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl border border-slate-100 p-6 shadow-sm space-y-4">
-        <h2 className="font-semibold text-slate-900">Edit Profile</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-[#111] rounded-2xl border border-[#222] p-6 space-y-4">
+        <h2 className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Edit Profile</h2>
         <Input label="Full name" {...register('name')} />
         <Textarea label="Bio" rows={3} placeholder="Tell buyers about yourself..." {...register('bio')} />
         <Button type="submit" loading={isSubmitting}>Save changes</Button>

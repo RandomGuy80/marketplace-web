@@ -9,7 +9,7 @@ export function Stars({ rating, max = 5, size = 16 }: { rating: number; max?: nu
           key={i}
           size={size}
           className={cn(
-            i < Math.round(rating) ? 'fill-amber-400 text-amber-400' : 'fill-slate-200 text-slate-200'
+            i < Math.round(rating) ? 'fill-white text-white' : 'fill-zinc-700 text-zinc-700'
           )}
         />
       ))}

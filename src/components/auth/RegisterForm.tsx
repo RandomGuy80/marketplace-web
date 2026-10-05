@@ -40,32 +40,32 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <Input label="Full name" placeholder="John Doe" error={errors.name?.message} {...register('name')} />
       <Input label="Email" type="email" placeholder="you@example.com" error={errors.email?.message} {...register('email')} />
       <Input label="Password" type="password" placeholder="min 8 characters" error={errors.password?.message} {...register('password')} />
 
-      <div className="flex flex-col gap-1">
-        <label className="text-sm font-medium text-slate-700">I want to</label>
+      <div className="flex flex-col gap-2">
+        <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">I want to</label>
         <div className="grid grid-cols-2 gap-3">
           {(['buyer', 'seller'] as const).map((r) => (
-            <label key={r} className="cursor-pointer">
+            <label key={r} className="cursor-none">
               <input type="radio" value={r} {...register('role')} className="sr-only peer" />
-              <div className="border-2 rounded-xl px-4 py-3 text-center text-sm font-medium transition-colors peer-checked:border-indigo-600 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 border-slate-200 text-slate-600 hover:border-slate-300">
+              <div className="border rounded-xl px-4 py-3 text-center text-sm font-medium transition-all duration-150 peer-checked:border-white peer-checked:bg-white/5 peer-checked:text-white border-[#222] text-zinc-500 hover:border-[#333] hover:text-zinc-300">
                 {r === 'buyer' ? '🛍 Buy' : '🏪 Sell'}
               </div>
             </label>
           ))}
         </div>
-        {errors.role && <p className="text-xs text-red-600">{errors.role.message}</p>}
+        {errors.role && <p className="text-xs text-red-400">{errors.role.message}</p>}
       </div>
 
       <Button type="submit" className="w-full" size="lg" loading={isSubmitting}>
         Create account
       </Button>
-      <p className="text-center text-sm text-slate-500">
+      <p className="text-center text-sm text-zinc-500">
         Have an account?{' '}
-        <Link href="/login" className="text-indigo-600 hover:underline font-medium">Sign in</Link>
+        <Link href="/login" className="text-zinc-200 hover:text-white font-medium transition-colors">Sign in</Link>
       </p>
     </form>
   )

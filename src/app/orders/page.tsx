@@ -26,8 +26,8 @@ export default function OrdersPage() {
   })
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">My Orders</h1>
+    <div className="max-w-4xl mx-auto px-4 py-10">
+      <h1 className="text-xl font-bold text-white tracking-tight mb-7">My Orders</h1>
 
       {isLoading && (
         <div className="space-y-3">
@@ -36,33 +36,33 @@ export default function OrdersPage() {
       )}
 
       {!isLoading && orders?.length === 0 && (
-        <div className="text-center py-20 text-slate-400">
-          <p className="text-5xl mb-4">📦</p>
-          <p className="font-medium">No orders yet</p>
-          <Link href="/listings" className="text-indigo-600 text-sm mt-2 inline-block hover:underline">Browse listings</Link>
+        <div className="text-center py-24 text-zinc-600">
+          <p className="text-5xl mb-4 opacity-30">📦</p>
+          <p className="font-medium text-zinc-500">No orders yet</p>
+          <Link href="/listings" className="text-zinc-400 text-sm mt-2 inline-block hover:text-white transition-colors">Browse listings →</Link>
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {orders?.map((order, i) => (
           <motion.div
             key={order.id}
-            initial={{ opacity: 0, y: 12 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05 }}
+            transition={{ delay: i * 0.04 }}
           >
-            <Link href={`/orders/${order.id}`} className="block bg-white rounded-2xl border border-slate-100 p-4 hover:shadow-md transition-shadow">
+            <Link href={`/orders/${order.id}`} className="block bg-[#111] rounded-2xl border border-[#222] p-4 hover:border-[#333] transition-all duration-150">
               <div className="flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-slate-400 mb-1">Order #{order.id.slice(0, 8)}</p>
-                  <p className="text-sm font-medium text-slate-900 truncate">
-                    {user?.id === order.buyer_id ? '🛍 Bought' : '📤 Sold'}
+                  <p className="text-xs text-zinc-600 mb-1 font-mono">#{order.id.slice(0, 8)}</p>
+                  <p className="text-sm font-medium text-zinc-300 truncate">
+                    {user?.id === order.buyer_id ? 'Purchased' : 'Sale'}
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-end gap-1.5">
                   <OrderStatusBadge status={order.status} />
-                  <span className="font-semibold text-slate-900">{formatPrice(order.amount)}</span>
-                  <span className="text-xs text-slate-400">{formatDate(order.created_at)}</span>
+                  <span className="font-semibold text-white text-sm">{formatPrice(order.amount)}</span>
+                  <span className="text-xs text-zinc-600">{formatDate(order.created_at)}</span>
                 </div>
               </div>
             </Link>

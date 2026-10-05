@@ -41,9 +41,9 @@ export default function NewListingPage() {
 
   if (!user || (user.role !== 'seller' && user.role !== 'admin')) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-20 text-center text-slate-500">
-        <p className="text-4xl mb-4">🏪</p>
-        <p className="font-medium">Only sellers can create listings.</p>
+      <div className="max-w-lg mx-auto px-4 py-24 text-center text-zinc-600">
+        <p className="text-4xl mb-4 opacity-30">🏪</p>
+        <p className="font-medium text-zinc-400">Only sellers can create listings.</p>
       </div>
     )
   }
@@ -92,19 +92,22 @@ export default function NewListingPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-slate-900 mb-6">New Listing</h1>
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-2xl border border-slate-100 p-6 space-y-5 shadow-sm">
-        <Input label="Title" placeholder="e.g. Logo Design Service" error={errors.title?.message} {...register('title')} />
-        <Textarea label="Description" rows={4} placeholder="Describe your service in detail..." error={errors.description?.message} {...register('description')} />
+    <div className="max-w-2xl mx-auto px-4 py-10">
+      <h1 className="text-xl font-bold text-white tracking-tight mb-7">New Listing</h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-[#111] rounded-2xl border border-[#222] p-6 space-y-5">
+        <Input label="Title" placeholder="e.g. Logo Design Service" error={errors.title?.message as string | undefined} {...register('title')} />
+        <Textarea label="Description" rows={4} placeholder="Describe your service in detail..." error={errors.description?.message as string | undefined} {...register('description')} />
 
         <div className="grid grid-cols-2 gap-4">
-          <Input label="Price (USD)" type="number" step="0.01" placeholder="0.00" error={errors.price?.message} {...register('price')} />
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-slate-700">Category</label>
-            <select {...register('category_id')} className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option value="">Select category</option>
-              {categories?.map((c) => <option key={c.id} value={c.id}>{c.icon} {c.name}</option>)}
+          <Input label="Price (USD)" type="number" step="0.01" placeholder="0.00" error={errors.price?.message as string | undefined} {...register('price')} />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Category</label>
+            <select
+              {...register('category_id')}
+              className="w-full rounded-xl border border-[#222] px-4 py-2.5 text-sm bg-[#111] text-white focus:outline-none focus:border-[#333] focus:ring-1 focus:ring-white/10 transition-all cursor-none"
+            >
+              <option value="" className="bg-[#111]">Select category</option>
+              {categories?.map((c) => <option key={c.id} value={c.id} className="bg-[#111]">{c.icon} {c.name}</option>)}
             </select>
           </div>
         </div>
@@ -112,21 +115,24 @@ export default function NewListingPage() {
         <Input label="Location (optional)" placeholder="City, Country" {...register('location')} />
         <Input label="Tags (comma separated)" placeholder="design, logo, branding" {...register('tags')} />
 
-        {/* Image upload */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-slate-700">Images (max 5)</label>
+          <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Images (max 5)</label>
           <div className="flex flex-wrap gap-2">
             {previews.map((src, i) => (
-              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-slate-200">
+              <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden border border-[#222]">
                 <img src={src} alt="" className="w-full h-full object-cover" />
-                <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-black/50 text-white rounded-full p-0.5 hover:bg-black/70">
+                <button type="button" onClick={() => removeImage(i)} className="absolute top-1 right-1 bg-black/70 text-white rounded-full p-0.5 hover:bg-black cursor-none">
                   <X size={10} />
                 </button>
               </div>
             ))}
             {images.length < 5 && (
-              <button type="button" onClick={() => fileRef.current?.click()} className="w-20 h-20 rounded-xl border-2 border-dashed border-slate-300 flex flex-col items-center justify-center text-slate-400 hover:border-indigo-400 hover:text-indigo-400 transition-colors">
-                <Upload size={18} />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                className="w-20 h-20 rounded-xl border border-dashed border-[#333] flex flex-col items-center justify-center text-zinc-600 hover:border-zinc-500 hover:text-zinc-400 transition-colors cursor-none"
+              >
+                <Upload size={16} />
                 <span className="text-xs mt-1">Add</span>
               </button>
             )}

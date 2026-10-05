@@ -23,25 +23,23 @@ export function Header() {
   ]
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
+    <header className="sticky top-0 z-40 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-[#222]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl text-indigo-600">
-          <ShoppingBag size={22} />
+        <Link href="/" className="flex items-center gap-2 font-bold text-lg text-white tracking-tight">
+          <ShoppingBag size={20} className="text-zinc-400" />
           <span>Merkit</span>
         </Link>
 
-        {/* Nav */}
         <nav className="hidden md:flex items-center gap-1">
           {nav.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                'px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150',
                 pathname.startsWith(item.href)
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  ? 'bg-white/8 text-white'
+                  : 'text-zinc-400 hover:text-white hover:bg-white/5'
               )}
             >
               {item.label}
@@ -49,59 +47,58 @@ export function Header() {
           ))}
         </nav>
 
-        {/* Right */}
         <div className="flex items-center gap-2">
           {user ? (
             <>
               {(user.role === 'seller' || user.role === 'admin') && (
                 <Link href="/listings/new">
-                  <Button size="sm" variant="outline">
-                    <Plus size={15} /> New Listing
+                  <Button size="sm" variant="secondary">
+                    <Plus size={14} /> New Listing
                   </Button>
                 </Link>
               )}
               <div className="relative">
                 <button
                   onClick={() => setMenuOpen(!menuOpen)}
-                  className="flex items-center gap-2 px-2 py-1 rounded-xl hover:bg-slate-100 transition-colors"
+                  className="flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-white/5 transition-colors cursor-none"
                 >
-                  <Avatar src={user.avatar} name={user.name} size={32} />
-                  <span className="hidden sm:block text-sm font-medium text-slate-700">{user.name}</span>
+                  <Avatar src={user.avatar} name={user.name} size={30} />
+                  <span className="hidden sm:block text-sm font-medium text-zinc-300">{user.name}</span>
                 </button>
                 {menuOpen && (
                   <div
-                    className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-lg border border-slate-100 py-1 z-50"
+                    className="absolute right-0 top-full mt-2 w-48 bg-[#111] rounded-2xl border border-[#2e2e2e] shadow-2xl shadow-black/60 py-1 z-50"
                     onMouseLeave={() => setMenuOpen(false)}
                   >
                     <Link
                       href="/profile/me"
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
                       onClick={() => setMenuOpen(false)}
                     >
-                      <User size={15} /> Profile
+                      <User size={14} className="text-zinc-500" /> Profile
                     </Link>
                     <Link
                       href="/orders"
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                      className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
                       onClick={() => setMenuOpen(false)}
                     >
-                      <Package size={15} /> Orders
+                      <Package size={14} className="text-zinc-500" /> Orders
                     </Link>
                     {user.role === 'admin' && (
                       <Link
                         href="/admin"
-                        className="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50"
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-zinc-300 hover:text-white hover:bg-white/5 transition-colors"
                         onClick={() => setMenuOpen(false)}
                       >
-                        <Shield size={15} /> Admin
+                        <Shield size={14} className="text-zinc-500" /> Admin
                       </Link>
                     )}
-                    <hr className="my-1 border-slate-100" />
+                    <div className="my-1 border-t border-[#222]" />
                     <button
                       onClick={() => { setMenuOpen(false); logout() }}
-                      className="flex items-center gap-2 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                      className="flex items-center gap-2.5 w-full px-4 py-2.5 text-sm text-red-400 hover:bg-red-950/30 transition-colors cursor-none"
                     >
-                      <LogOut size={15} /> Sign out
+                      <LogOut size={14} /> Sign out
                     </button>
                   </div>
                 )}

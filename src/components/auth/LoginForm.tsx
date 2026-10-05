@@ -37,15 +37,15 @@ export function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <Input label="Email" type="email" placeholder="you@example.com" error={errors.email?.message} {...register('email')} />
       <Input label="Password" type="password" placeholder="••••••••" error={errors.password?.message} {...register('password')} />
       <Button type="submit" className="w-full" size="lg" loading={isSubmitting}>
         Sign in
       </Button>
-      <p className="text-center text-sm text-slate-500">
+      <p className="text-center text-sm text-zinc-500">
         No account?{' '}
-        <Link href="/register" className="text-indigo-600 hover:underline font-medium">Sign up</Link>
+        <Link href="/register" className="text-zinc-200 hover:text-white font-medium transition-colors">Sign up</Link>
       </p>
     </form>
   )

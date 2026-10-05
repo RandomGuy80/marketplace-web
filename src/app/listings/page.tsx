@@ -50,25 +50,25 @@ function ListingsContent() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <form onSubmit={handleSearch} className="flex gap-2 mb-6">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <form onSubmit={handleSearch} className="flex gap-2 mb-8">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-600" size={17} />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Search listings..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-[#222] text-sm bg-[#111] text-white placeholder:text-zinc-600 focus:outline-none focus:border-[#333] focus:ring-1 focus:ring-white/10 transition-all cursor-none"
           />
         </div>
         <Button type="submit" size="md">Search</Button>
       </form>
 
       {categories && (
-        <div className="flex gap-2 flex-wrap mb-6">
+        <div className="flex gap-2 flex-wrap mb-8">
           <button
             onClick={() => { setCursor(undefined); setAllItems([]); setFilter((f) => ({ ...f, category_id: undefined })) }}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${!filter.category_id ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-none ${!filter.category_id ? 'bg-white text-black' : 'bg-[#111] border border-[#222] text-zinc-500 hover:border-[#333] hover:text-zinc-300'}`}
           >
             All
           </button>
@@ -76,7 +76,7 @@ function ListingsContent() {
             <button
               key={cat.id}
               onClick={() => { setCursor(undefined); setAllItems([]); setFilter((f) => ({ ...f, category_id: cat.id })) }}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${filter.category_id === cat.id ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'}`}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 cursor-none ${filter.category_id === cat.id ? 'bg-white text-black' : 'bg-[#111] border border-[#222] text-zinc-500 hover:border-[#333] hover:text-zinc-300'}`}
             >
               {cat.icon} {cat.name}
             </button>
@@ -91,7 +91,7 @@ function ListingsContent() {
       </div>
 
       {data?.next_cursor && (
-        <div className="mt-8 text-center">
+        <div className="mt-10 text-center">
           <Button variant="outline" onClick={() => setCursor(data.next_cursor)}>
             Load more
           </Button>
@@ -99,9 +99,10 @@ function ListingsContent() {
       )}
 
       {!isLoading && allItems.length === 0 && (
-        <div className="text-center py-20 text-slate-400">
-          <p className="text-5xl mb-4">🔍</p>
-          <p className="text-lg font-medium">No listings found</p>
+        <div className="text-center py-24 text-zinc-600">
+          <p className="text-5xl mb-4 opacity-30">🔍</p>
+          <p className="text-base font-medium text-zinc-500">No listings found</p>
+          <p className="text-sm text-zinc-700 mt-1">Try a different search or category</p>
         </div>
       )}
     </div>
@@ -111,7 +112,7 @@ function ListingsContent() {
 export default function ListingsPage() {
   return (
     <Suspense fallback={
-      <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {Array.from({ length: 8 }).map((_, i) => <ListingCardSkeleton key={i} />)}
       </div>
     }>

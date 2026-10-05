@@ -15,50 +15,49 @@ export function ListingCard({ listing, index = 0 }: { listing: Listing; index?: 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.05 }}
-      whileHover={{ y: -4, transition: { duration: 0.15 } }}
+      transition={{ duration: 0.3, delay: index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+      whileHover={{ y: -3, transition: { duration: 0.2, ease: 'easeOut' } }}
     >
       <Link href={`/listings/${listing.id}`} className="block group">
-        <div className="rounded-2xl bg-white border border-slate-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-          {/* Image */}
-          <div className="relative h-48 bg-gradient-to-br from-indigo-50 to-violet-50">
+        <div className="rounded-2xl bg-[#111] border border-[#222] overflow-hidden transition-all duration-200 hover:border-[#333] hover:shadow-xl hover:shadow-black/30">
+          <div className="relative h-48 bg-zinc-900">
             {thumb ? (
               <Image
                 src={getImageUrl(thumb)}
                 alt={listing.title}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-cover group-hover:scale-105 transition-transform duration-500"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center text-4xl text-slate-300">
+              <div className="absolute inset-0 flex items-center justify-center text-4xl text-zinc-700">
                 🖼
               </div>
             )}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="absolute top-3 right-3">
               <ListingStatusBadge status={listing.status} />
             </div>
           </div>
 
-          {/* Content */}
           <div className="p-4">
-            <h3 className="font-semibold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors">
+            <h3 className="font-semibold text-white line-clamp-1 group-hover:text-zinc-200 transition-colors">
               {listing.title}
             </h3>
-            <p className="mt-1 text-sm text-slate-500 line-clamp-2">{listing.description}</p>
+            <p className="mt-1 text-sm text-zinc-500 line-clamp-2 leading-relaxed">{listing.description}</p>
 
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-lg font-bold text-indigo-600">
+              <span className="text-base font-bold text-white">
                 {formatPrice(listing.price, listing.currency)}
               </span>
-              <div className="flex items-center gap-3 text-xs text-slate-400">
+              <div className="flex items-center gap-3 text-xs text-zinc-600">
                 {listing.location && (
                   <span className="flex items-center gap-1">
-                    <MapPin size={12} /> {listing.location}
+                    <MapPin size={11} /> {listing.location}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
-                  <Eye size={12} /> {listing.views}
+                  <Eye size={11} /> {listing.views}
                 </span>
               </div>
             </div>
